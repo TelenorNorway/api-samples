@@ -44,8 +44,14 @@ app.get('/', (req, res) => {
 
 // list all webhooks
 app.get('/webhooks/:msisdn', (req, res) => {
+
+  // Get all webhooks on given msisdn. I.e. /webhooks/4712345678)
+  // msisdn must stasrt with 47 following by the phone number
   getWebhooks(req.params.msisdn, req.query.token)
     .then((result) => {
+
+      // Renders the webhooks view (views/webhooks.hbs) using
+      // the { webhooks: ... } object as the model
       res.render('webhooks', { webhooks: result.data });
     })
     .catch((error) => {
