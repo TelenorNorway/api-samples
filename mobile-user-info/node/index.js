@@ -15,12 +15,13 @@
  */
 
 const express = require('express');
-
-const app = express();
 const authRoutes = require('./auth')
-const { getUserInfo } = require('./libs/mobileuserinfo');
+
+const app = express()
+    , { getUserInfo } = require('./libs/mobileuserinfo');
 
 
+// Inject authorize routes
 app.use(authRoutes);
 
 
@@ -39,6 +40,7 @@ app.get('/userinfo', (req, res) => {
       res.send(error);
     });
 });
+
 
 // Start HTTP server
 app.listen(3000, () => {

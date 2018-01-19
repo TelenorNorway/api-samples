@@ -20,9 +20,10 @@ const express = require('express')
     , path = require('path')
 
 const authRoutes = require('./auth')
-    , app = express()
+    , { getWebhooks } = require('./libs/ifttt');
 
-const { getWebhooks } = require('./libs/ifttt');
+const app = express()
+
 
 
 // setup views directory
