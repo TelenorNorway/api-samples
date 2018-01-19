@@ -19,7 +19,7 @@ const config = require('../config');
 
 
 // Retrieve a list of all webhooks
-function getWebhooks(msisdn, token, callback) {
+function getWebhooks(msisdn, token) {
   const requestOptions = {
     hostname: config.api_host,
     path: `/ifttt-webhooks/v1/tel:${msisdn}/webhooks`,
