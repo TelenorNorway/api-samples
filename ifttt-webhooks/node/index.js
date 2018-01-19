@@ -15,10 +15,9 @@
  */
 
 const express = require('express')
+    , http = require('http')
     , path = require('path')
-    , http = require('http');
-
-const TelenorAuthLibrary = require('../../../telenor-auth-library/lib');
+    , TelenorAuthLibrary = require('telenor-auth-library');
 
 const app = express()
     , Auth = new TelenorAuthLibrary('api.telenor.no');
