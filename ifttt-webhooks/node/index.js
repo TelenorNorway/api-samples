@@ -15,12 +15,19 @@
  */
 
 const express = require('express')
+    , hbs = require('hbs')
     , http = require('http')
     , path = require('path')
 
 const authRoutes = require('./auth')
     , app = express()
 
+
+
+// setup views directory
+app.set('views', path.join(__dirname, 'views'));
+// setup view engine
+app.set('view engine', 'hbs');
 
 app.use(authRoutes);
 
