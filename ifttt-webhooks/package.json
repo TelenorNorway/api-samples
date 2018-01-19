@@ -1,0 +1,14 @@
+{
+  "name": "ifttt-webhooks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Telenor Norge",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.16.2",
+    "querystring": "^0.2.0"
+  }
+}
