@@ -17,52 +17,17 @@
 const express = require('express')
     , http = require('http')
     , path = require('path')
-    , TelenorAuthLibrary = require('telenor-auth-library');
 
-const app = express()
-    , Auth = new TelenorAuthLibrary('api.telenor.no');
+const authRoutes = require('./auth')
+    , app = express()
 
-const config = {
-  client_id: '',
-  client_secret: ''
-};
+
+app.use(authRoutes);
 
 
 // Example application routes
 app.get('/', (req, res) => {
   res.send('ifttt-webhook');
-});
-
-// Triggers end user consent
-app.get('/authorize', (req, res) => {
-  Auth.AuthorizationCode().authorize(config.client_id)
-      .then((data) => {
-        if (data.headers && data.headers.location) {
-          res.redirect(data.headers.location);
-        } else {
-          res.redirect('/');
-        }
-      })
-      .catch((error) => {
-        res.send('Failed authorizing.');
-      });
-});
-
-
-// Callback route after user authentication
-// Success object: { access_token, expires_in }
-app.get('/authorized', (req, res) => {
-  if (req.query.code === undefined) {
-    return res.send('Invalid request.');
-  }
-
-  Auth.AuthorizationCode().getToken(config.client_id, config.client_secret, req.query.code)
-      .then((data) => {
-        res.send(data.data);
-      })
-      .catch((error) => {
-        res.send('Error fetching token');
-      });
 });
 
 
