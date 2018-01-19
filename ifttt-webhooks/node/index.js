@@ -22,6 +22,7 @@ const express = require('express')
 const authRoutes = require('./auth')
     , app = express()
 
+const { getWebhooks } = require('./libs/ifttt');
 
 
 // setup views directory
@@ -29,12 +30,26 @@ app.set('views', path.join(__dirname, 'views'));
 // setup view engine
 app.set('view engine', 'hbs');
 
+
+// inject authorize routes
 app.use(authRoutes);
 
 
 // Example application routes
 app.get('/', (req, res) => {
   res.send('ifttt-webhook');
+});
+
+
+// list all webhooks
+app.get('/webhooks/:msisdn', (req, res) => {
+  getWebhooks(req.params.msisdn, req.query.token)
+    .then((result) => {
+      res.render('webhooks', { webhooks: result.data });
+    })
+    .catch((error) => {
+      res.send(error);
+    });
 });
 
 

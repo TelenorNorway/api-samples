@@ -16,8 +16,6 @@
 
 
 //
-// auth.js
-//
 // Contains example routes for the authorization_code sequence:
 // - /authorize
 // - /authorized
@@ -33,6 +31,7 @@ const Auth = new TelenorAuthLibrary(config.api_host)
 
 
 // Triggers end user consent
+// This will redirect the user to a Telenor specific login page.
 router.get('/authorize', (req, res) => {
   Auth.AuthorizationCode().authorize(config.client_id)
       .then((data) => {
@@ -57,7 +56,7 @@ router.get('/authorized', (req, res) => {
 
   Auth.AuthorizationCode().getToken(config.client_id, config.client_secret, req.query.code)
       .then((data) => {
-        res.send(data.data);
+        res.redirect(`/webhooks?token=${data.data.access_token}`);
       })
       .catch((error) => {
         res.send('Error fetching token');
