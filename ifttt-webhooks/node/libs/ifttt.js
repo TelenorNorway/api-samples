@@ -48,7 +48,7 @@ function getWebhooks(msisdn, token) {
       res.on('end', () => {
         try {
           const data = JSON.parse(rawData);
-          resolve(null, { headers: res.headers, data: data });
+          resolve({ headers: res.headers, data: data });
         } catch (error) {
           reject(new Error('Error parsing data').message);
         }
