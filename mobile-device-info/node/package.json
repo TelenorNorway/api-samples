@@ -1,0 +1,13 @@
+{
+  "name": "mobile-device-info",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Telenor Norge",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.16.2",
+    "telenor-auth-library": "github:TelenorNorway/auth-library"
+  }
+}
