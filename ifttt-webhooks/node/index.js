@@ -17,14 +17,21 @@
 const express = require('express')
     , bodyParser = require('body-parser')
     , hbs = require('hbs')
-    , path = require('path')
+    , path = require('path');
 
 const { getWebhooks } = require('./libs/ifttt')
     , config = require('./config')
     , TelenorAuthLibrary = require('telenor-auth-library');
 
-const app = express()
-    , Auth = new TelenorAuthLibrary(config);
+const app = express();
+
+const Auth = new TelenorAuthLibrary({
+  clientId: config.clientId,
+  clientSecret: config.clientSecret,
+  hostname: config.hostname,
+  scope: 'ifttt-webhooks-v1',
+  state: 'testState123' // Should be a nonce
+});
 
 
 app.use(bodyParser.json());
@@ -47,10 +54,7 @@ app.post('/webhooks', (req, res) => {
   // msisdn must stasrt with 47 following by the phone number
   getWebhooks(req.body.msisdn, req.body.token)
    .then((result) => res.send(result))
-   .catch((error) => {
-     console.log(error);
-     res.status(200).send(error.message);
-   });
+   .catch((error) => res.status(200).send(error.message));
 });
 
 
@@ -66,9 +70,9 @@ app.get('/authorize', (req, res) => {
 // Callback route after user authentication
 // Success object: { access_token, expires_in }
 app.get('/callback', (req, res) => {
-  Auth.AuthorizationCode().getToken(req.query.code)
+  Auth.AuthorizationCode().getToken(req.originalUrl)
       .then((result) => res.redirect(`/?token=${result.access_token}`))
-      .catch((error) => res.status(200).send('Error fetching token'));
+      .catch((error) => res.status(200).send(`Error: ${error.message}`));
 });
 
 
