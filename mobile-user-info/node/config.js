@@ -1,5 +1,5 @@
 module.exports = {
-  api_host: 'api.telenor.no',
-  client_id: '',
-  client_secret: ''
+  hostname: 'api.telenor.no',
+  clientId: '',
+  clientSecret: ''
 };

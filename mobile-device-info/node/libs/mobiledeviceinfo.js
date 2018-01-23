@@ -19,7 +19,7 @@ const config = require('../config');
 
 function getDeviceInfo(token) {
   const options = {
-    host: config.api_host,
+    host: config.hostname,
     path: '/mobile-device-info/v1/device',
     method: 'GET',
     headers: {
@@ -37,16 +37,12 @@ function getDeviceInfo(token) {
         error = new Error(`Failed to get mobile device info.\nStatus code: ${res.statusCode}`);
       }
 
-      if (error) {
-        return reject(error.message);
-      }
-
       res.on('data', (chunk) => { rawData += chunk; })
 
       res.on('end', () => {
         try {
           const data = JSON.parse(rawData);
-          resolve({ headers: res.headers, data: data });
+          resolve({ headers: res.headers, data: data, error: error });
         } catch (error) {
           reject(new Error(`Could not parse data.`).message);
         }

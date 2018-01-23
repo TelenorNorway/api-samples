@@ -1,8 +1,42 @@
 <h1>Webhooks</h1>
-<ul>
-  {{#each webhooks}}
-    <li>
-      {{codeword}}
-    </li>
-  {{/each}}
-</ul>
+
+{{#if token}}
+  <p>Your token: {{token}}</p>
+
+  <input type="hidden" id="accessToken" value="{{token}}">
+  <input id="msisdn" type="text" name="msisdn">
+  <button id="queryButton">Query</button>
+
+  <div id="resultContainer">
+    <h2>Results:</h2>
+    <div id="result"></div>
+  </div>
+{{else}}
+  <p>You have no token. <a href="/authorize">Request your token</a></p>
+{{/if}}
+
+<script>
+ var accessToken = document.getElementById('accessToken').value;
+
+ var msisdnElement = document.getElementById('msisdn');
+ var resultElement = document.getElementById('result');
+ var queryButton = document.getElementById('queryButton');
+
+ function success() {
+   resultElement.innerHTML = this.responseText
+ }
+
+ queryButton.addEventListener('click', function (event) {
+   var req = new XMLHttpRequest();
+   req.open('POST', '/webhooks', true);
+   req.setRequestHeader('Content-Type', 'application/json');
+   req.onload = success;
+
+   var requestObject = {
+     token: accessToken,
+     msisdn: msisdnElement.value
+   };
+
+   req.send(JSON.stringify(requestObject));
+ });
+</script>

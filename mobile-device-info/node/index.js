@@ -14,31 +14,46 @@
    limitations under the License.
  */
 
-const express = require('express');
-const authRoutes = require('./auth')
+const express = require('express')
+    , http = require('http')
+    , path = require('path')
+
+const { getDeviceInfo } = require('./libs/mobiledeviceinfo')
+    , config = require('./config')
+    , TelenorAuthLibrary = require('telenor-auth-library');
 
 const app = express()
-    , { getDeviceInfo } = require('./libs/mobiledeviceinfo');
-
-
-// Inject authorize routes
-app.use(authRoutes);
+    , Auth = new TelenorAuthLibrary(config);
 
 
 app.get('/', (req, res) => {
-  res.send('mobile-user-info');
+  res.status(200).send('mobile-user-info');
 });
 
 
 // Display userinfo results from API
 app.get('/deviceinfo', (req, res) => {
   getDeviceInfo(req.query.token)
-    .then((data) => {
-      res.send(data)
-    })
-    .catch((error) => {
-      res.send(error);
-    });
+    .then((data) => res.status(200).send(data))
+    .catch((error) => res.status(200).send(error));
+});
+
+
+// Triggers end user consent
+// This will redirect the user to a Telenor specific login page.
+app.get('/authorize', (req, res) => {
+  Auth.AuthorizationCode().authorize()
+      .then((location) => res.redirect(location))
+      .catch((error) => res.status(401).send('Failed authorizing.'));
+});
+
+
+// Callback route after user authentication
+// Success object: { access_token, expires_in }
+app.get('/callback', (req, res) => {
+  Auth.AuthorizationCode().getToken(req.query.code)
+      .then((result) => res.redirect(`/?token=${result.access_token}`))
+      .catch((error) => res.status(200).send('Error fetching token'));
 });
 
 

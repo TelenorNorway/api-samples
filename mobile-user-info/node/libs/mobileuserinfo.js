@@ -21,7 +21,7 @@ const config = require('../config');
 // Retrieve user info
 function getUserInfo(token) {
   const options = {
-    host: config.api_host,
+    host: config.hostname,
     path: '/user-info/v1/users',
     method: 'GET',
     headers: {
@@ -30,7 +30,7 @@ function getUserInfo(token) {
     }
   };
 
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       let error;
       let rawData = '';
@@ -39,16 +39,12 @@ function getUserInfo(token) {
         error = new Error(`Failed to fetch user info.\nStatus code: ${res.statusCode}`);
       }
 
-      if (error) {
-        return reject(error.message);
-      }
-
       res.on('data', (chunk) => { rawData += chunk; });
 
       res.on('end', () => {
         try {
           const data = JSON.parse(rawData);
-          resolve({ headers: res.headers, data: data });
+          resolve({ headers: res.headers, data: data, error: error });
         } catch (error) {
           reject(new Error(`Could not parse data.\nStatus code: ${res.statusCode}`).message);
         }

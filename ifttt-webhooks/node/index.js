@@ -15,54 +15,64 @@
  */
 
 const express = require('express')
+    , bodyParser = require('body-parser')
     , hbs = require('hbs')
-    , http = require('http')
     , path = require('path')
 
-const authRoutes = require('./auth')
-    , { getWebhooks } = require('./libs/ifttt');
+const { getWebhooks } = require('./libs/ifttt')
+    , config = require('./config')
+    , TelenorAuthLibrary = require('telenor-auth-library/lib');
 
 const app = express()
+    , Auth = new TelenorAuthLibrary(config);
 
 
-
+app.use(bodyParser.json());
 // setup views directory
 app.set('views', path.join(__dirname, 'views'));
 // setup view engine
 app.set('view engine', 'hbs');
 
 
-// inject authorize routes
-app.use(authRoutes);
-
 
 // Example application routes
 app.get('/', (req, res) => {
-  res.send('ifttt-webhook');
+  res.render('webhooks', { token: req.query.token });
 });
 
 
 // list all webhooks
-app.get('/webhooks/:msisdn', (req, res) => {
-
-  // Get all webhooks on given msisdn. I.e. /webhooks/4712345678)
+app.post('/webhooks', (req, res) => {
+  // Get all webhooks on given msisdn
   // msisdn must stasrt with 47 following by the phone number
-  getWebhooks(req.params.msisdn, req.query.token)
-    .then((result) => {
+  getWebhooks(req.body.msisdn, req.body.token)
+   .then((result) => res.send(result))
+   .catch((error) => {
+     console.log(error);
+     res.status(200).send(error.message);
+   });
+});
 
-      // Renders the webhooks view (views/webhooks.hbs) using
-      // the { webhooks: ... } object as the model
-      res.render('webhooks', { webhooks: result.data });
-    })
-    .catch((error) => {
-      res.send(error);
-    });
+
+// Triggers end user consent
+// This will redirect the user to a Telenor specific login page.
+app.get('/authorize', (req, res) => {
+  Auth.AuthorizationCode().authorize()
+      .then((location) => res.redirect(location))
+      .catch((error) => res.status(401).send('Failed authorizing.'));
+});
+
+
+// Callback route after user authentication
+// Success object: { access_token, expires_in }
+app.get('/callback', (req, res) => {
+  Auth.AuthorizationCode().getToken(req.query.code)
+      .then((result) => res.redirect(`/?token=${result.access_token}`))
+      .catch((error) => res.status(200).send('Error fetching token'));
 });
 
 
 // Start http server on port 3000
-const server = http.createServer(app);
-
-server.listen(3000, () => {
+app.listen(3000, () => {
   console.log('Server is live');
 });

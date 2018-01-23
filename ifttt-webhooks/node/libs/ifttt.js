@@ -21,7 +21,7 @@ const config = require('../config');
 // Retrieve a list of all webhooks
 function getWebhooks(msisdn, token) {
   const requestOptions = {
-    hostname: config.api_host,
+    hostname: config.hostname,
     path: `/ifttt-webhooks/v1/tel:${msisdn}/webhooks`,
     headers: {
       'Content-Type': 'application/json',
@@ -30,17 +30,13 @@ function getWebhooks(msisdn, token) {
     }
   };
 
-  return new Promise(function (resolve, reject) {
-    const req = https.request(requestOptions, function (res) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(requestOptions, (res) => {
       let error;
       let rawData = '';
 
-      if (res.stautsCode !== 200) {
+      if (res.stautsCode < 200 || res.statusCode >= 400) {
         error = new Error(`Could not fetch webhooks.\nStatus code: ${res.statusCode}`);
-      }
-
-      if (error) {
-        return reject(error.message);
       }
 
       res.on('data', (chunk) => { rawData += chunk; });
@@ -48,8 +44,9 @@ function getWebhooks(msisdn, token) {
       res.on('end', () => {
         try {
           const data = JSON.parse(rawData);
-          resolve({ headers: res.headers, data: data });
+          resolve({ headers: res.headers, data: data, error: !!error });
         } catch (error) {
+
           reject(new Error('Error parsing data').message);
         }
       });
