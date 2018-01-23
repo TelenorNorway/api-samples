@@ -21,7 +21,7 @@ const express = require('express')
 
 const { getWebhooks } = require('./libs/ifttt')
     , config = require('./config')
-    , TelenorAuthLibrary = require('telenor-auth-library/lib');
+    , TelenorAuthLibrary = require('telenor-auth-library');
 
 const app = express()
     , Auth = new TelenorAuthLibrary(config);
