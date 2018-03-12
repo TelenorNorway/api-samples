@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 app.get('/userinfo', (req, res) => {
   getUserInfo(req.query.token)
     .then((data) => res.status(200).send(data))
-    .catch((error) => res.status(200).send(error));
+    .catch((error) => res.status(400).send(error));
 });
 
 
@@ -53,7 +53,7 @@ app.get('/authorize', (req, res) => {
 app.get('/callback', (req, res) => {
   Auth.AuthorizationCode().getToken(req.originalUrl)
       .then((result) => res.redirect(`/?token=${result.access_token}`))
-      .catch((error) => res.status(200).send(`Error: ${error.message}`));
+      .catch((error) => res.status(400).send(`Error: ${error.message}`));
 });
 
 // Start HTTP server
