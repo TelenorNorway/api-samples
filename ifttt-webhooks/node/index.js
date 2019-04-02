@@ -51,10 +51,10 @@ app.get('/', (req, res) => {
 // list all webhooks
 app.post('/webhooks', (req, res) => {
   // Get all webhooks on given msisdn
-  // msisdn must stasrt with 47 following by the phone number
+  // msisdn must start with 47 following by the phone number
   getWebhooks(req.body.msisdn, req.body.token)
    .then((result) => res.send(result))
-   .catch((error) => res.status(200).send(error.message));
+   .catch((error) => res.status(400).send(error.message));
 });
 
 
@@ -72,7 +72,7 @@ app.get('/authorize', (req, res) => {
 app.get('/callback', (req, res) => {
   Auth.AuthorizationCode().getToken(req.originalUrl)
       .then((result) => res.redirect(`/?token=${result.access_token}`))
-      .catch((error) => res.status(200).send(`Error: ${error.message}`));
+      .catch((error) => res.status(400).send(`Error: ${error.message}`));
 });
 
 
